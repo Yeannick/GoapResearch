@@ -4,7 +4,7 @@ Goal Oriented Action Planning Research Topic
 
 Engine: Unreal engine ( version 4.26.2 )
 
-![alt text](https://www.google.com/url?sa=i&url=https%3A%2F%2Fgamedevelopment.tutsplus.com%2Ftutorials%2Fgoal-oriented-action-planning-for-a-smarter-ai--cms-20793&psig=AOvVaw3WLIVrwjGl59XWs2utdk4-&ust=1641747276225000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCJiZkqvPovUCFQAAAAAdAAAAABAO)
+![alt text]()
 
 GOAP structure will be programmed in c++ 
 Ai/ Npc's  might be set up in BluePrints.
