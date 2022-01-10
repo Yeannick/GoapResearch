@@ -2,6 +2,10 @@
 
 Goal Oriented Action Planning Research Topic
 
+FrameWork : GamePlayProgramming course Elite FrameWork using SDL
+
+goal : Making a 2D enviroment with AI that uses GOAP decisionMaking structure.
+
 
 
 Sources :
