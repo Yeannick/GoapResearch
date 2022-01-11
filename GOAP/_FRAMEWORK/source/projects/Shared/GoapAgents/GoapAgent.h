@@ -14,10 +14,11 @@ public :
 	// GoapFunctions
 
 	void SetDecisionMaking(Elite::IDecisionMaking* decisionmakingStructure);
-
+	void SetToSeek(Elite::Vector2 seekPos);
+	
 private :
 	Elite::IDecisionMaking* m_DecisionMaking = nullptr;
 	float m_MovementSpeed = 25.f;
-
+	ISteeringBehavior* m_pSeek = nullptr;
 };
 

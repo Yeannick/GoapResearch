@@ -15,11 +15,14 @@ namespace Elite
 	public:
 		FSMState(){}
 		virtual ~FSMState() = default;
+		
 
 		virtual void OnEnter(Blackboard* pBlackboard) {};
 		virtual void OnExit(Blackboard* pBlackboard) {};
 		virtual void Update(Blackboard* pBlackboard, float deltaTime) {};
+		virtual std::string GetName()=0;
 
+		
 	};
 
 	class FSMTransition

@@ -186,6 +186,7 @@
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPWorldState.cpp" />
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPNode.cpp" />
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPPlanner.cpp" />
+    <ClCompile Include="projects\DecisionMaking\FiniteStateMachines\GOAPStatesAndTransitions.cpp" />
     <ClCompile Include="projects\Shared\GoapAgents\GoapAgent.cpp" />
     <ClCompile Include="projects\DecisionMaking\FiniteStateMachines\App_GoapGame.cpp" />
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteFiniteStateMachine\EFiniteStateMachine.cpp" />
@@ -238,6 +239,7 @@
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPWorldState.h" />
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPNode.h" />
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPPlanner.h" />
+    <ClInclude Include="projects\DecisionMaking\FiniteStateMachines\GOAPStatesAndTransitions.h" />
     <ClInclude Include="projects\Shared\GoapAgents\GoapAgent.h" />
     <ClInclude Include="projects\DecisionMaking\FiniteStateMachines\App_GoapGame.h" />
     <ClInclude Include="framework\EliteAI\EliteData\EBlackboard.h" />

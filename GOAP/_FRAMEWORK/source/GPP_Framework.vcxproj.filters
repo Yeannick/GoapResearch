@@ -46,6 +46,7 @@
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPWorldState.cpp" />
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPNode.cpp" />
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPPlanner.cpp" />
+    <ClCompile Include="projects\DecisionMaking\FiniteStateMachines\GOAPStatesAndTransitions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="projects\App_Selector.h" />
@@ -138,6 +139,7 @@
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPWorldState.h" />
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPNode.h" />
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPPlanner.h" />
+    <ClInclude Include="projects\DecisionMaking\FiniteStateMachines\GOAPStatesAndTransitions.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />

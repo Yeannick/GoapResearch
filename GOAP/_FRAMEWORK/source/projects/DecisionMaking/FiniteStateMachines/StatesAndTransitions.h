@@ -31,6 +31,12 @@ public:
 		}
 		pAgent->SetToWander();
 	};
+	virtual std::string GetName()  override
+	{
+		return name;
+	}
+	int ID = 1;
+	std::string name = "WanderState";
 private :
 
 };
@@ -57,6 +63,12 @@ public :
 		}
 		
 	}
+	virtual std::string GetName()  override
+	{
+		return name;
+	}
+	int ID = 2;
+	std::string name = "SeekForFood";
 };
 // Evade bigger agents state 
 class EvadeState : public Elite::FSMState
@@ -73,6 +85,12 @@ class EvadeState : public Elite::FSMState
 		pAgent->SetToFlee(pFleeTarget->GetPosition());
 
 	}
+	virtual std::string GetName()  override
+	{
+		return name;
+	}
+	int ID = 3;
+	std::string name = "EvadeState";
 };
 // Pursuit smaller agents state
 class PursuitState : public Elite::FSMState
@@ -101,6 +119,12 @@ class PursuitState : public Elite::FSMState
 			}
 		}
 	}
+	virtual std::string GetName()  override
+	{
+		return name;
+	}
+	int ID = 4;
+	std::string name = "PursuitState";
 };
 // move From border state
 class EvadeBorder : public Elite::FSMState
@@ -114,6 +138,12 @@ class EvadeBorder : public Elite::FSMState
 		pAgent->SetToSeek(Elite::randomVector2(0, TrimWorldSize));
 		
 	}
+	virtual std::string GetName()  override
+	{
+		return name;
+	}
+	int ID = 5;
+	std::string name = "EvadeBorder";
 };
 //-----------------
 //---TRANSITIONS---
