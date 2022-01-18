@@ -8,7 +8,7 @@ GOAP::Node::Node(): gCost(0), hCost(0)
 	Id = ++LastID;
 }
 
-GOAP::Node::Node(const WorldState state, int g, int h, int parentId, const Action* action):
+GOAP::Node::Node(const WorldState state, int g, int h, int parentId,  Action* action):
 	Worldstate(state),
 	gCost(g),
 	hCost(h),

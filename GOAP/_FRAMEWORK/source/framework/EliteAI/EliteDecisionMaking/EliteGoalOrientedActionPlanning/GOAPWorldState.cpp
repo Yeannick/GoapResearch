@@ -6,14 +6,14 @@ GOAP::WorldState::WorldState(const std::string name):
 {
 }
 
-void GOAP::WorldState::SetVariable(const int varID, const bool value)
+void GOAP::WorldState::SetVariable(const std::string key, const bool value)
 {
-	Variables[varID] = value;
+	Variables[key] = value;
 }
 
-bool GOAP::WorldState::GetVariable(const int varID) const
+bool GOAP::WorldState::GetVariable(const std::string key) const
 {
-	return Variables.at(varID);
+	return Variables.at(key);
 }
 
 bool GOAP::WorldState::MeetsGoal(const WorldState& goalState) const

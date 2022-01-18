@@ -55,11 +55,11 @@ int GOAP::Planner::CalculateHeuristic(const WorldState& current, const WorldStat
 	return current.DistanceTo(goal);
 }
 
-std::vector<GOAP::Action> GOAP::Planner::Plan(const WorldState& start, const WorldState& goal, const std::vector<Action>& actions)
+std::vector<GOAP::Action*> GOAP::Planner::Plan(const WorldState& start, const WorldState& goal, const std::vector<Action*> actions)
 {
 	if (start.MeetsGoal(goal))
 	{
-		return std::vector<GOAP::Action>();
+		return std::vector<GOAP::Action*>();
 	}
 	m_OpenList.clear();
 	m_ClosedList.clear();
@@ -74,10 +74,11 @@ std::vector<GOAP::Action> GOAP::Planner::Plan(const WorldState& start, const Wor
 
 		if (current.Worldstate.MeetsGoal(goal))
 		{
-			std::vector<GOAP::Action> Plan;
+			std::vector<GOAP::Action*> Plan;
 			do
 			{
-				Plan.push_back(*current.action);
+				Plan.push_back(current.action);
+				//Plan->push_back(current.action);
 				auto It = std::find_if(m_OpenList.begin(), m_OpenList.end(), [&](const Node& n)
 					{
 						return n.Id == current.ParentId;
@@ -95,9 +96,9 @@ std::vector<GOAP::Action> GOAP::Planner::Plan(const WorldState& start, const Wor
 		}
 		for (const auto& Potential : actions)
 		{
-			if (Potential.CanOperateWorldState(current.Worldstate))
+			if (Potential->CanOperateWorldState(current.Worldstate))
 			{
-				WorldState outcome = Potential.ActOnWorldState(current.Worldstate);
+				WorldState outcome = Potential->ActOnWorldState(current.Worldstate);
 
 				if (OnClosedList(outcome))
 				{
@@ -108,16 +109,16 @@ std::vector<GOAP::Action> GOAP::Planner::Plan(const WorldState& start, const Wor
 
 				if (outComeNode == m_OpenList.end())
 				{
-					Node found(outcome, current.gCost + Potential.GetCost(), CalculateHeuristic(outcome, goal), current.Id, &Potential);
+					Node found(outcome, current.gCost + Potential->GetCost(), CalculateHeuristic(outcome, goal), current.Id, Potential);
 					AddToOpenList(std::move(found));
 				}
 				else
 				{
-					if (current.gCost + Potential.GetCost() < outComeNode->gCost) {
+					if (current.gCost + Potential->GetCost() < outComeNode->gCost) {
 						outComeNode->ParentId = current.Id;                  
-						outComeNode->gCost = current.gCost + Potential.GetCost(); 
+						outComeNode->gCost = current.gCost + Potential->GetCost(); 
 						outComeNode->hCost = CalculateHeuristic(outcome, goal);
-						outComeNode->action = &Potential;
+						outComeNode->action = Potential;
 
 						std::sort(m_OpenList.begin(), m_OpenList.end());
 					}

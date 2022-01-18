@@ -17,15 +17,18 @@ public :
 	void Update(float deltaTime) override;
 	void Render(float deltaTime) const override;
 
+	std::vector<GOAP::Action*> GetActions();
+	void SetStateName(std::string name) { m_StateName = name; }
 private:
 	float m_TrimWorldSize = 100.f;;
 	
 	// Action will be used as states in FSM to make AI do stuff
 	std::vector<Elite::FSMState*> m_pStates{};
 	std::vector<GoapAgent*> m_GoapAgents;
-
+	std::vector<GoapAgent*> m_pEnemies;
 	bool GetConditionState(int conditionID);
-	std::vector<GOAP::Action> m_Actions;
+	std::vector<GOAP::Action*> m_Actions;
+	std::string m_StateName;
 
 	void UpdateImGui();
 };

@@ -10,13 +10,13 @@ namespace GOAP
 
 		std::string name;
 
-		std::map<int, bool> Variables;
+		std::map<std::string, bool> Variables;
 
 		WorldState(const std::string name = "");
 
-		void SetVariable(const int varID, const bool value);
+		void SetVariable(const std::string key, const bool value);
 
-		bool GetVariable(const int varID) const;
+		bool GetVariable(const std::string key) const;
 
 		// does this state 'other' meet the requirement of this goal
 		bool MeetsGoal(const WorldState& goalState) const;

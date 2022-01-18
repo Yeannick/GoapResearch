@@ -13,10 +13,10 @@ namespace GOAP
 		int ParentId;
 		int gCost;
 		int hCost;
-		const Action* action;
+		Action* action;
 
 		Node();
-		Node(const WorldState state, int g, int h, int parentId, const Action* action);
+		Node(const WorldState state, int g, int h, int parentId, Action* action);
 
 		// Fcost is g + h cost
 		int GetFCost () const { return gCost + hCost; }

@@ -11,12 +11,43 @@ GOAP::Action::Action(std::string name, int cost)
 	m_Cost = cost;
 }
 
-GOAP::Action::Action(std::string name, int cost, int id)
+
+void GOAP::Action::AddPrecondition(std::string key, bool state)
 {
-	m_Name = name;
-	m_Cost = cost;
-	m_ID = id;
+	m_PreConditions.insert({ key,state });
 }
+
+void GOAP::Action::RemovePrecondition(std::string key)
+{
+	m_PreConditions.erase(key);
+}
+
+void GOAP::Action::AddEffect(std::string key, bool state)
+{
+	m_Effects.insert({ key, state });
+}
+
+void GOAP::Action::RemoveEffect(std::string key)
+{
+	m_Effects.erase(key);
+}
+
+bool GOAP::Action::RequireRange()
+{
+	return false;
+}
+
+std::unordered_map<std::string, bool> GOAP::Action::GetPreconditons()
+{
+	return m_PreConditions;
+}
+
+std::unordered_map<std::string, bool> GOAP::Action::GetEffect()
+{
+	return m_Effects;
+}
+
+
 
 bool GOAP::Action::CanOperateWorldState(const GOAP::WorldState& worldstate) const
 {
@@ -46,3 +77,4 @@ GOAP::WorldState GOAP::Action::ActOnWorldState(const GOAP::WorldState& ws) const
 	}
 	return temp;
 }
+
