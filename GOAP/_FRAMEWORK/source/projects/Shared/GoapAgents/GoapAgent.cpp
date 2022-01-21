@@ -7,13 +7,14 @@ GoapAgent::GoapAgent(Elite::Vector2 pos):
 {
 
 	m_pSeek = new Seek();
-	
+	m_pArrival = new Arrive();
 }
 
 GoapAgent::GoapAgent(Elite::Vector2 pos, Elite::Color color):
 	SteeringAgent(2.0f)
 {
 	m_pSeek = new Seek();
+	m_pArrival = new Arrive();
 	m_BodyColor = color;
 	SetPosition(pos);
 }
@@ -44,6 +45,20 @@ void GoapAgent::SetToSeek(Elite::Vector2 seekPos)
 	this->SetMaxLinearSpeed(m_MovementSpeed*2);
 	m_pSeek->SetTarget(seekPos);
 	SetSteeringBehavior(m_pSeek);
+}
+
+void GoapAgent::SetToArrival(Elite::Vector2 seekPos)
+{
+	this->SetMaxLinearSpeed(m_MovementSpeed * 2);
+	m_pArrival->SetTarget(seekPos);
+	SetSteeringBehavior(m_pArrival);
+}
+
+void GoapAgent::SetToStill()
+{
+	this->SetMaxLinearSpeed(0);
+	this->SetLinearVelocity({ 0.f,0.f });
+	SetSteeringBehavior(nullptr);
 }
 
 void GoapAgent::SetActions(std::vector<GOAP::Action*> actions)

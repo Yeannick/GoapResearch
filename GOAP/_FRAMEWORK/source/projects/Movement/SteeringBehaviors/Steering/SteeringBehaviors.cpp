@@ -50,7 +50,7 @@ SteeringOutput Arrive::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 	SteeringOutput steering = {};
 
 	//const float arrivalRadius = 1.f;
-	const float slowRadius = 10.f;
+	const float slowRadius = 20.f;
 
 	Elite::Vector2 toTarget = m_Target.Position - pAgent->GetPosition();
 	const float distance = toTarget.Magnitude();
@@ -71,6 +71,7 @@ SteeringOutput Arrive::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 	{
 		DEBUGRENDERER2D->DrawDirection(pAgent->GetPosition(), steering.LinearVelocity, 5.f, { 0,1,0,1 });
 		DEBUGRENDERER2D->DrawCircle(pAgent->GetPosition(), slowRadius, { 0,0,1,1 },0.f);
+		DEBUGRENDERER2D->DrawPoint(m_Target.Position, 5.f, Elite::Color{ 1.f,0.f,0.f });
 	}
 	return steering;
 }

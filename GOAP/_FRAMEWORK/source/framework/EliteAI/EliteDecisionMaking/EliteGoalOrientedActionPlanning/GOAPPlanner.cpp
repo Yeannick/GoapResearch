@@ -65,6 +65,7 @@ std::vector<GOAP::Action*> GOAP::Planner::Plan(const WorldState& start, const Wo
 	m_ClosedList.clear();
 
 	Node StartNode(start, 0, CalculateHeuristic(start, goal), 0, nullptr);
+	
 
 	m_OpenList.push_back(std::move(StartNode));
 
@@ -92,6 +93,7 @@ std::vector<GOAP::Action*> GOAP::Planner::Plan(const WorldState& start, const Wo
 				current = *It;
 			} 
 			while (current.ParentId != 0);
+			Plan.push_back(current.action);
 			return Plan;
 		}
 		for (const auto& Potential : actions)

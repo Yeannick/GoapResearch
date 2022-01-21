@@ -15,6 +15,7 @@ c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\source\tem
 c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\source\tempfiles\debug\egraphnodetypes.obj
 c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\source\tempfiles\debug\egraphconnectiontypes.obj
 c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\source\tempfiles\debug\efinitestatemachine.obj
+c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\source\tempfiles\debug\app_goapgame.obj
 c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\source\tempfiles\debug\goapagent.obj
 c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\source\tempfiles\debug\goapstatesandtransitions.obj
 c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\source\tempfiles\debug\goapplanner.obj
@@ -46,7 +47,6 @@ c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\source\tem
 c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\source\tempfiles\debug\agariofood.obj
 c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\source\tempfiles\debug\agariocontactlistener.obj
 c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\source\tempfiles\debug\agarioagent.obj
-c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\source\tempfiles\debug\app_goapgame.obj
 c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\bin\debug\gpp_framework.exe
 c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\source\tempfiles\debug\gpp_framework.ilk
 c:\users\yanni\documents\unreal projects\goapresearch\goap\_framework\bin\debug\gpp_framework.pdb

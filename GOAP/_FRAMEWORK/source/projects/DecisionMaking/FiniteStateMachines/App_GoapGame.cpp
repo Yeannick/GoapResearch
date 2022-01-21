@@ -23,69 +23,50 @@ void App_GoapGame::Start()
 
 	auto pEnemy = new GoapAgent({ 80.f,80.f }, Elite::Color{ 1.f,1.f,0.f });
 
-	
+	pAgent->SetRenderBehavior(true);
 
 	m_pEnemies.push_back(pEnemy);
-	RunningAction* pRunning = new RunningAction();
-
-	pRunning->AddPrecondition("EnemySighted", false);
-	pRunning->AddPrecondition("WeaponInHand", true);
-	pRunning->AddEffect("EnemySighted", true);
-	pRunning->SetCost(150);
-	pRunning->SetName(pRunning->GetName());
-	pRunning->SetTarget(pEnemy);
-
-	m_Actions.push_back(pRunning);
-
-	ApproachClose* pApproachClose = new ApproachClose();
 	
-	pApproachClose->AddPrecondition("EnemySighted", true);
-	pApproachClose->AddPrecondition("EnemyDead", false);
-	pApproachClose->AddPrecondition("EnemyInCloseRange", false);
-	pApproachClose->AddEffect("EnemyInCloseRange", true);
-	pApproachClose->AddEffect("EnemySighted", true);
-	pApproachClose->SetCost(4);
-	pApproachClose->SetName(pApproachClose->GetName());
-	pApproachClose->SetTarget(pEnemy);
-	m_Actions.push_back(pApproachClose);
-
+	Stabbing* pStabbing = new Stabbing();
+	pStabbing->SetCost(4);
+	Shooting* pShooting = new Shooting();
+	pShooting->SetCost(3);
+	SelfDestruct* pSelfDestruct = new SelfDestruct();
+	pSelfDestruct->SetCost(6);
+	PickUpKnife* pPickUpKnife = new PickUpKnife();
+	pPickUpKnife->SetCost(2);
+	PickUpGun* pPickUpGun = new PickUpGun();
+	pPickUpGun->SetCost(2);
+	PickUpBomb* pPickUpBomb = new PickUpBomb();
+	pPickUpBomb->SetCost(2);
 	DrawKnife* pDrawKnife = new DrawKnife();
-
-	pDrawKnife->AddPrecondition("InventoryKnife" , true);
-	pDrawKnife->AddPrecondition("WeaponInHand" , false);
-	pDrawKnife->AddPrecondition("KnifeDrawn" , false);
-	pDrawKnife->AddEffect("KnifeDrawn",true);
-	pDrawKnife->AddEffect("WeaponInHand" , true);
 	pDrawKnife->SetCost(1);
-	pDrawKnife->SetName(pDrawKnife->GetName());
-	m_Actions.push_back(pDrawKnife);
-
-	SheathKnife* pSheathKnife = new SheathKnife();
-
-	pSheathKnife->AddPrecondition("WeaponInHand", true);
-	pSheathKnife->AddPrecondition("KnifeDrawn", true);
-	pSheathKnife->AddEffect("KnifeDrawn", false);
-	pSheathKnife->AddEffect("WeaponInHand", false);
-	pSheathKnife->SetCost(1);
-	pSheathKnife->SetName(pSheathKnife->GetName());
-	m_Actions.push_back(pSheathKnife);
-	Stab* pStab = new Stab();
+	DrawGun* pDrawGun = new DrawGun();
+	pDrawGun->SetCost(2);
+	DrawBomb* pDrawBomb = new DrawBomb();
+	pDrawBomb->SetCost(3);
+	SheatKnife* pSheatKnife = new SheatKnife();
+	pSheatKnife->SetCost(1);
+	SheatGun* pSheatGun = new SheatGun();
+	pSheatGun->SetCost(2);
 	
-	pStab->AddPrecondition("EnemySighted", true);
-	pStab->AddPrecondition("EnemyDead", false);
-	pStab->AddPrecondition("KnifeDrawn", true);
-	pStab->AddPrecondition("EnemyInCloseRange", true);
-	pStab->AddEffect("EnemyDead", true);
-	pStab->SetCost(3);
-	pStab->SetName(pStab->GetName());
-	pStab->SetTarget(pEnemy);
-	m_Actions.push_back(pStab);
-
+	m_Actions.push_back(pStabbing);
+	m_Actions.push_back(pShooting);
+	m_Actions.push_back(pSelfDestruct);
+	m_Actions.push_back(pPickUpKnife);
+	m_Actions.push_back(pPickUpGun);
+	m_Actions.push_back(pPickUpBomb);
+	m_Actions.push_back(pDrawKnife);
+	m_Actions.push_back(pDrawGun);
+	m_Actions.push_back(pDrawBomb);
+	m_Actions.push_back(pSheatKnife);
+	m_Actions.push_back(pSheatGun);
+	
     // Now establish some goal states and an initial state
     GOAP::WorldState goal_win;
     goal_win.SetVariable("EnemyDead", true);
     goal_win.SetVariable("MeDead", false);
-    goal_win.SetVariable("WeaponInHand", false);
+  //  goal_win.SetVariable("WeaponInHand", false);
     
     goal_win.priority = 100;
 
@@ -93,17 +74,17 @@ void App_GoapGame::Start()
     // elicit different plans from the AI.
     GOAP::WorldState initial_state;
     initial_state.SetVariable("EnemyDead", false);
-    initial_state.SetVariable("EnemySighted", false);
-    initial_state.SetVariable("EnemyInRange", false);
-    initial_state.SetVariable("EnemyInCloseRange", false);
-    initial_state.SetVariable("GunLoaded", false);
-    initial_state.SetVariable("GunDrawn", false);
-    initial_state.SetVariable("KnifeDrawn", true);
-    initial_state.SetVariable("WeaponInHand", true);
-    initial_state.SetVariable("MeDead", false);
-    initial_state.SetVariable("HaveAmmo", false);
-    initial_state.SetVariable("InventoryKnife", true);
-    initial_state.SetVariable("InventoryGun", true);
+    initial_state.SetVariable("KnifeAvailable", true);
+    initial_state.SetVariable("KnifeInInventory", false);
+    initial_state.SetVariable("KnifeInHand", false);
+    initial_state.SetVariable("GunAvailable", true);
+    initial_state.SetVariable("GunInInventory", false);
+    initial_state.SetVariable("GunInHand", false);
+    initial_state.SetVariable("WeaponInHand", false);
+    initial_state.SetVariable("BombAvailable", true);
+    initial_state.SetVariable("BombInInventory", false);
+    initial_state.SetVariable("BombInHand", false);
+	initial_state.SetVariable("MeDead", false);
 
     GOAP::WorldState currentWorldState;
 
@@ -126,9 +107,9 @@ void App_GoapGame::Start()
 
 
 	
-	Transition* TransitionMoveTo = new Transition();
+	Transition* MoveToTransition = new Transition();
 	TransitionPerformAction* TransitionPerform = new TransitionPerformAction();
-
+	TransitionMoveTo* TransitionPerformMoveTo = new TransitionMoveTo();
 	
 
     pBlackBoard->AddData("Agent", pAgent);
@@ -140,8 +121,9 @@ void App_GoapGame::Start()
 	pBlackBoard->AddData("Target", pEnemy);
 
     FiniteStateMachine* pFSM = new FiniteStateMachine(m_pStates[0], pBlackBoard);
-	pFSM->AddTransition(pIdleState, pMoveToState, TransitionMoveTo);
+	pFSM->AddTransition(pIdleState, pMoveToState, MoveToTransition);
 	pFSM->AddTransition(pMoveToState, pPerformActionState, TransitionPerform);
+	pFSM->AddTransition(pPerformActionState,pMoveToState,TransitionPerformMoveTo);
     pAgent->SetDecisionMaking(pFSM);
 
 	
@@ -157,6 +139,7 @@ void App_GoapGame::Update(float deltaTime)
 	{
 		agent->Update(deltaTime);
 		agent->LimitToWorld(m_TrimWorldSize);
+		
 		m_StateName = agent->GetStateName();
 	}
 	for (auto e : m_pEnemies)
@@ -180,6 +163,7 @@ void App_GoapGame::Render(float deltaTime) const
 	for (auto agent : m_GoapAgents)
 	{
 		agent->Render(deltaTime);
+		
 	}
 }
 

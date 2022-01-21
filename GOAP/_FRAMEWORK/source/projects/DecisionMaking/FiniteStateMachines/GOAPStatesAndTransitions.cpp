@@ -1,113 +1,177 @@
 #include "stdafx.h"
 #include "GOAPStatesAndTransitions.h"
 
-RunningAction::RunningAction()
+// Stabbing Class
+Stabbing::Stabbing()
 {
-	
+	AddPrecondition("KnifeInHand", true);
+	AddPrecondition("EnemyDead", false);
+	AddEffect("EnemyDead",true);
+	m_Range = 5.f;
 }
 
-bool RunningAction::Perform(Elite::Blackboard* pBlackboard)
+bool Stabbing::Perform(Elite::Blackboard* pBlackboard)
 {
-	GoapAgent* pAgent = nullptr;
-
-	bool GetAgent = pBlackboard->GetData("Agent", pAgent);
-
-	GoapAgent* pTarget = nullptr;
-
-	bool GetTarget = pBlackboard->GetData("Target", pTarget);
-
-	if (GetAgent && GetTarget)
-	{
-		pAgent->SetToSeek(pTarget->GetPosition());
-
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool RunningAction::RequireRange()
-{
+	std::cout << " Stabbing Enemy \n";
 	return true;
 }
+// ------------------------------------------------------------------//
 
-void RunningAction::SetTarget(SteeringAgent* agent)
+Shooting::Shooting()
 {
-	m_Target = agent->GetPosition();
+	AddPrecondition("GunInHand", true);
+	AddPrecondition("EnemyDead", false);
+	AddEffect("EnemyDead", true);
+	m_Range = 20.f;
 }
 
-void RunningAction::SetTarget(Elite::Vector2 pos)
+bool Shooting::Perform(Elite::Blackboard* pBlackboard)
 {
-	m_Target = pos;
-}
-
-ApproachClose::ApproachClose()
-{
-}
-
-bool ApproachClose::Perform(Elite::Blackboard* pBlackboard)
-{
-	std::cout << "Approached close\n";
+	std::cout << " Shooting Enemy \n";
 	return true;
 }
+// ------------------------------------------------------------------//
 
-bool ApproachClose::RequireRange()
+SelfDestruct::SelfDestruct()
 {
+	AddPrecondition("BombInHand", true);
+	AddPrecondition("EnemyDead", false);
+	AddEffect("EnemyDead", true);
+	AddEffect("MeDead", true);
+	m_Range = 2.f;
+}
+
+bool SelfDestruct::Perform(Elite::Blackboard* pBlackboard)
+{
+	std::cout << " SelfDestructing taking enemy with me \n";
 	return true;
 }
+// ------------------------------------------------------------------//
+
+PickUpKnife::PickUpKnife()
+{
+	AddPrecondition("KnifeAvailable", true);
+	AddPrecondition("KnifeInInventory", false);
+	AddEffect("KnifeInInventory", true);
+	m_Range = 1.f;
+}
+
+bool PickUpKnife::Perform(Elite::Blackboard* pBlackboard)
+{
+	std::cout << "Picked Up Knife \n";
+	return true;
+}
+// ------------------------------------------------------------------//
+
+PickUpGun::PickUpGun()
+{
+	AddPrecondition("GunAvailable", true);
+	AddPrecondition("GunInInventory", false);
+	AddEffect("GunInInventory", true);
+	m_Range = 1.f;
+}
+
+bool PickUpGun::Perform(Elite::Blackboard* pBlackboard)
+{
+	std::cout << " Picked up Gun \n";
+	return true;
+}
+// ------------------------------------------------------------------//
+PickUpBomb::PickUpBomb()
+{
+	AddPrecondition("BombAvailable", true);
+	AddPrecondition("BombInInventory", false);
+	AddEffect("BombInInventory", true);
+	m_Range = 1.f;
+}
+
+bool PickUpBomb::Perform(Elite::Blackboard* pBlackboard)
+{
+	std::cout << " Picked Up Bomb \n";
+	return true;
+}
+// ------------------------------------------------------------------//
 
 DrawKnife::DrawKnife()
 {
+	AddPrecondition("KnifeInInventory", true);
+	AddPrecondition("KnifeInHand", false);
+	AddPrecondition("WeaponInHand", false);
+	AddEffect("WeaponInHand", true);
+	AddEffect("KnifeInHand", true);
+
+	m_Range = 0.f;
 }
 
 bool DrawKnife::Perform(Elite::Blackboard* pBlackboard)
 {
-	std::cout << "Drawn Knife \n";
-	return false;
+	std::cout << " drawing my Knife \n";
+	return true;
+}
+// ------------------------------------------------------------------//
+
+DrawGun::DrawGun()
+{
+	AddPrecondition("GunInInventory", true);
+	AddPrecondition("GunInHand", false);
+	AddPrecondition("WeaponInHand", false);
+	AddEffect("WeaponInHand", true);
+	AddEffect("GunInHand", true);
+
+	m_Range = 0.f;
 }
 
-bool DrawKnife::RequireRange()
+bool DrawGun::Perform(Elite::Blackboard* pBlackboard)
 {
-	return false;
+	std::cout << " Drawing my Gun \n";
+	return true;
+}
+// ------------------------------------------------------------------//
+
+DrawBomb::DrawBomb()
+{
+	AddPrecondition("BombInInventory", true);
+	AddPrecondition("BombInHand", false);
+	AddPrecondition("WeaponInHand", false);
+	AddEffect("WeaponInHand", true);
+	AddEffect("BombInHand", true);
+
+	m_Range = 0.f;
 }
 
-SheathKnife::SheathKnife()
+bool DrawBomb::Perform(Elite::Blackboard* pBlackboard)
 {
+	std::cout << "Drawing my bomb \n";
+	return true;
+}
+// ------------------------------------------------------------------//
+
+SheatKnife::SheatKnife()
+{
+	AddPrecondition("KnifeInHand", true);
+	AddEffect("KnifeInHand", false);
+
+	m_Range = 0.f;
 }
 
-bool SheathKnife::Perform(Elite::Blackboard* pBlackboard)
+bool SheatKnife::Perform(Elite::Blackboard* pBlackboard)
 {
-	std::cout << "sheated knife\n";
-	return false;
-}
-
-bool SheathKnife::RequireRange()
-{
-	return false;
-}
-
-Stab::Stab()
-{
-}
-
-bool Stab::Perform(Elite::Blackboard* pBlackboard)
-{
-	GoapAgent* pAgent;
-
-	bool GetAgent = pBlackboard->GetData("Agent", pAgent);
-
-	auto target = pAgent->GetTarget();
-	if (Elite::Distance(pAgent->GetPosition(),target) < m_Range)
-	{
-		std::cout << "stabbed enemy\n";
-	}
+	std::cout << "Put away my Knife \n";
 
 	return true;
 }
+// ------------------------------------------------------------------//
 
-bool Stab::RequireRange()
+SheatGun::SheatGun()
 {
+	AddPrecondition("GunInHand", true);
+	AddEffect("GunInHand", false);
+
+	m_Range = 0.f;
+}
+
+bool SheatGun::Perform(Elite::Blackboard* pBlackboard)
+{
+	std::cout << "Put away my Gun \n";
 	return true;
 }

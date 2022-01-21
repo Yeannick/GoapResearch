@@ -49,7 +49,7 @@ public:
 		// check if action can be performed
 		std::reverse(PlannedActions.begin(), PlannedActions.end());
 		auto precon = PlannedActions.front()->GetPreconditons();
-	
+		pAgent->SetActionPath(PlannedActions);
 		pBlackboard->ChangeData("Plan", PlannedActions);
 		pBlackboard->AddData("Action", PlannedActions[0]);
 
@@ -72,19 +72,42 @@ class MoveTo : public Elite::FSMState
 public:
 	virtual void OnEnter(Elite::Blackboard* pBlackboard)override
 	{
+
+		// Get Agent
+		GoapAgent* pAgent = nullptr;
+		bool GetAgent = pBlackboard->GetData("Agent", pAgent);
+		// Get Target from action 
+		if (GetAgent)
+		{
+			auto Path = pAgent->GetActionPath();
+			Elite::Vector2 target;
+			if (!Path.empty())
+			{
+				target = Path.front()->GetTarget();
+			}
+			if (GetAgent)
+			{
+				// set steering
+				pAgent->SetToArrival(target);
+			}
+
+			pAgent->SetStateName(name);
+		}
+		
+		
+	}
+	virtual void OnExit(Elite::Blackboard* pBlackboard)override
+	{
+		// disable steering
 		GoapAgent* pAgent = nullptr;
 		bool GetAgent = pBlackboard->GetData("Agent", pAgent);
 
-		GoapAgent* pTarget;
-		bool GetEnemies = pBlackboard->GetData("Target", pTarget);
-
-		if (GetAgent && GetEnemies)
+		if (GetAgent)
 		{
-			
-			pAgent->SetToSeek(pTarget->GetPosition());
+			pAgent->SetToStill();
 		}
-		pAgent->SetStateName(name);
 	}
+	
 	virtual std::string GetName()  override
 	{
 		return name;
@@ -96,85 +119,248 @@ class PerformAction : public Elite::FSMState
 public:
 	virtual void OnEnter(Elite::Blackboard* pBlackboard)override
 	{
-		GoapAgent* pAgent = nullptr;
-		bool GetAgent = pBlackboard->GetData("Agent", pAgent);
 
-		std::vector<GOAP::Action*> plan;
-		bool getPlan = pBlackboard->GetData("Plan", plan);
+		// GetAgent 
+		
+		GetAgent = pBlackboard->GetData("Agent", pAgent);
 
-		GOAP::WorldState ws;
-		bool GetWorldState = pBlackboard->GetData("WorldState", ws);
+		
+		GetWorldSate = pBlackboard->GetData("WorldState", ws);
 
-		if (getPlan && GetWorldState)
+		performed = false;
+		// get agents actions
+		if (GetAgent && GetWorldSate)
 		{
-			bool performed = plan.front()->Perform(pBlackboard);
-			if (performed)
+			
+			pAgent->SetStateName(name); 
+		}
+	}
+	virtual void Update(Elite::Blackboard* pBlackboard, float deltaTime)
+	{
+		if (GetAgent && GetWorldSate)
+		{
+			auto path = pAgent->GetActionPath();
+			if (!path.empty())
 			{
-				ws = plan.front()->ActOnWorldState(ws);
-				plan.erase(plan.begin());
-
-				if (plan.front()->CanOperateWorldState(ws))
+				if (path.front()->CanOperateWorldState(ws))
 				{
-					std::cout << " next action : " << plan.front()->GetName() << "\n";
+					//action perform
+					performed = path.front()->Perform(pBlackboard);
+				}
+				// if action performed , Set effects , remove action from list 
+				if (performed)
+				{
+					ws = path.front()->ActOnWorldState(ws);
+					path.erase(path.begin());
+					pBlackboard->ChangeData("WorldState", ws);
+					pAgent->SetActionPath(path);
 				}
 			}
 		}
-		pAgent->SetStateName(name);
 	}
 	virtual std::string GetName()  override
 	{
 		return name;
 	}
-	int ID = 3;
+	GOAP::WorldState ws;
+	GoapAgent* pAgent = nullptr;
+	bool GetAgent = false;
+	bool GetWorldSate = false;
+	bool performed = false;
 	std::string name = "Perform Action";
 };
 
 
 
-class RunningAction : public GOAP::Action
+
+
+class Stabbing : public GOAP::Action
 {
-public:
-	RunningAction();
+public :
+	Stabbing();
 
 	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
-	virtual std::string GetName() const override { return m_Name; }
-	bool RequireRange() override;
+
+	bool RequireRange()override
+	{
+		if (m_Range > 0.f)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	void SetRange(float range) { m_Range = range; }
 	float GetRange() const { return m_Range; }
-	void SetTarget(SteeringAgent* agent);
-	void SetTarget(Elite::Vector2 pos);
-	virtual Elite::Vector2 GetTarget() { return m_Target; }
 
-	float m_Range = 0.f;
-	bool m_InRange = false;
-	SteeringAgent* m_pTarget;
+	void SetTarget(Elite::Vector2 position) { m_Target = position; }
+	virtual Elite::Vector2 GetTarget() { return m_Target; }
+	std::string GetName()const override { return m_Name; }
+
+private:
+	float m_Range;
 	Elite::Vector2 m_Target;
 
-	std::string m_Name = "Running";
-	
+	std::string m_Name = "Stabbing";
 };
-class ApproachClose : public GOAP::Action
+class Shooting : public GOAP::Action
 {
 public:
-	ApproachClose();
+	Shooting();
 
 	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
-	virtual std::string GetName() const override { return m_Name; }
-	bool RequireRange() override;
+
+	bool RequireRange()override
+	{
+		if (m_Range > 0.f)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
 	void SetRange(float range) { m_Range = range; }
 	float GetRange() const { return m_Range; }
-	void SetTarget(SteeringAgent* agent) { m_Target = agent->GetPosition(); }
-	void SetTarget(Elite::Vector2 pos) { m_Target = pos; }
+
+	void SetTarget(Elite::Vector2 position) { m_Target = position; }
 	virtual Elite::Vector2 GetTarget() { return m_Target; }
 
-	float m_Range = 20.f;
-	bool m_InRange = false;
-	SteeringAgent* m_pTarget;
+	std::string GetName()const override { return m_Name; }
+private:
+	float m_Range;
 	Elite::Vector2 m_Target;
-	
-	std::string m_Name = "ApproachClose";
-	
+
+	std::string m_Name = "Shooting";
+};
+class SelfDestruct : public GOAP::Action
+{
+public:
+	SelfDestruct();
+
+	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+
+	bool RequireRange()override
+	{
+		if (m_Range > 0.f)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	void SetRange(float range) { m_Range = range; }
+	float GetRange() const { return m_Range; }
+
+	void SetTarget(Elite::Vector2 position) { m_Target = position; }
+	virtual Elite::Vector2 GetTarget() { return m_Target; }
+	std::string GetName()const override { return m_Name; }
+private:
+	float m_Range;
+	Elite::Vector2 m_Target;
+
+	std::string m_Name = "SelfDestruct";
+};
+class PickUpKnife : public GOAP::Action
+{
+public:
+	PickUpKnife();
+
+	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+
+	bool RequireRange()override
+	{
+		if (m_Range > 0.f)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	void SetRange(float range) { m_Range = range; }
+	float GetRange() const { return m_Range; }
+
+	void SetTarget(Elite::Vector2 position) { m_Target = position; }
+	virtual Elite::Vector2 GetTarget() { return m_Target; }
+	std::string GetName()const override { return m_Name; }
+private:
+	float m_Range;
+	Elite::Vector2 m_Target;
+
+	std::string m_Name = "PickUpKnife";
+};
+class PickUpGun : public GOAP::Action
+{
+public:
+	PickUpGun();
+
+	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+
+	bool RequireRange()override
+	{
+		if (m_Range > 0.f)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	void SetRange(float range) { m_Range = range; }
+	float GetRange() const { return m_Range; }
+
+	void SetTarget(Elite::Vector2 position) { m_Target = position; }
+	virtual Elite::Vector2 GetTarget() { return m_Target; }
+	std::string GetName()const override { return m_Name; }
+private:
+	float m_Range;
+	Elite::Vector2 m_Target;
+
+	std::string m_Name = "PickUpGun";
+};
+class PickUpBomb : public GOAP::Action
+{
+public:
+	PickUpBomb();
+
+	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+
+	bool RequireRange()override
+	{
+		if (m_Range > 0.f)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	void SetRange(float range) { m_Range = range; }
+	float GetRange() const { return m_Range; }
+
+	void SetTarget(Elite::Vector2 position) { m_Target = position; }
+	virtual Elite::Vector2 GetTarget() { return m_Target; }
+	std::string GetName()const override { return m_Name; }
+private:
+	float m_Range;
+	Elite::Vector2 m_Target;
+
+	std::string m_Name = "PickUpBomb";
 };
 class DrawKnife : public GOAP::Action
 {
@@ -182,64 +368,155 @@ public:
 	DrawKnife();
 
 	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
-	virtual std::string GetName() const override { return m_Name; }
-	bool RequireRange() override;
+
+	bool RequireRange()override
+	{
+		if (m_Range > 0.f)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	void SetRange(float range) { m_Range = range; }
 	float GetRange() const { return m_Range; }
-	void SetTarget(SteeringAgent* agent) { m_Target = agent->GetPosition(); }
-	void SetTarget(Elite::Vector2 pos) { m_Target = pos; }
+
+	void SetTarget(Elite::Vector2 position) { m_Target = position; }
 	virtual Elite::Vector2 GetTarget() { return m_Target; }
-	
-	bool m_InRange = false;
-	SteeringAgent* m_pTarget;
+	std::string GetName()const override { return m_Name; }
+private:
+	float m_Range;
 	Elite::Vector2 m_Target;
-	float m_Range = 0.f;
+
 	std::string m_Name = "DrawKnife";
 };
-class SheathKnife : public GOAP::Action
+class DrawGun : public GOAP::Action
 {
 public:
-	SheathKnife();
+	DrawGun();
 
 	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
-	virtual std::string GetName() const override { return m_Name; }
-	bool RequireRange() override;
+
+	bool RequireRange()override
+	{
+		if (m_Range > 0.f)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	void SetRange(float range) { m_Range = range; }
 	float GetRange() const { return m_Range; }
-	void SetTarget(SteeringAgent* agent) { m_Target = agent->GetPosition(); }
-	void SetTarget(Elite::Vector2 pos) { m_Target = pos; }
+
+	void SetTarget(Elite::Vector2 position) { m_Target = position; }
 	virtual Elite::Vector2 GetTarget() { return m_Target; }
-	
-	bool m_InRange = false;
-	SteeringAgent* m_pTarget;
+	std::string GetName()const override { return m_Name; }
+private:
+	float m_Range;
 	Elite::Vector2 m_Target;
-	float m_Range = 0.f;
-	std::string m_Name = "SheathKnife";
-	
+
+	std::string m_Name = "DrawGun";
 };
-class Stab : public GOAP::Action
+class DrawBomb : public GOAP::Action
 {
 public:
-	Stab();
+	DrawBomb();
 
 	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
-	virtual std::string GetName() const override { return m_Name; }
-	bool RequireRange() override;
-	virtual void SetRange(float range) override { m_Range = range; }
-	virtual float GetRange() const override { return m_Range; }
-	virtual void SetTarget(SteeringAgent* agent)override { m_Target = agent->GetPosition(); }
-	virtual void SetTarget(Elite::Vector2 pos)override { m_Target = pos; }
+
+	bool RequireRange()override
+	{
+		if (m_Range > 0.f)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	void SetRange(float range) { m_Range = range; }
+	float GetRange() const { return m_Range; }
+
+	void SetTarget(Elite::Vector2 position) { m_Target = position; }
 	virtual Elite::Vector2 GetTarget() { return m_Target; }
-	
-	bool m_InRange = false;
-	SteeringAgent* m_pTarget;
+	std::string GetName()const override { return m_Name; }
+private:
+	float m_Range;
 	Elite::Vector2 m_Target;
-	std::string m_Name = "Stab";
-	float m_Range = 5.f;
-	
+
+	std::string m_Name = "DrawBomb";
 };
+class SheatKnife : public GOAP::Action
+{
+public:
+	SheatKnife();
 
+	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
 
+	bool RequireRange()override
+	{
+		if (m_Range > 0.f)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	void SetRange(float range) { m_Range = range; }
+	float GetRange() const { return m_Range; }
+
+	void SetTarget(Elite::Vector2 position) { m_Target = position; }
+	virtual Elite::Vector2 GetTarget() { return m_Target; }
+	std::string GetName()const override { return m_Name; }
+private:
+	float m_Range;
+	Elite::Vector2 m_Target;
+
+	std::string m_Name = "SheatKnife";
+};
+class SheatGun : public GOAP::Action
+{
+public:
+	SheatGun();
+
+	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+
+	bool RequireRange()override 
+	{
+		if (m_Range > 0.f)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	void SetRange(float range) { m_Range = range; }
+	float GetRange() const { return m_Range; }
+
+	void SetTarget(Elite::Vector2 position) { m_Target = position; }
+	virtual Elite::Vector2 GetTarget() { return m_Target; }
+	std::string GetName()const override { return m_Name; }
+private:
+	float m_Range;
+	Elite::Vector2 m_Target;
+
+	std::string m_Name = "SheatGun";
+};
 /////////////////
 
 
@@ -250,8 +527,8 @@ class TransitionPerformAction : public Elite::FSMTransition
 		std::vector<GOAP::Action*> plan;
 		GoapAgent* pAgent;
 		bool GetAgent = pBlackboard->GetData("Agent", pAgent);
-		bool getPlan = pBlackboard->GetData("Plan", plan);
-		if (getPlan && GetAgent)
+		plan = pAgent->GetActionPath();
+		if ( GetAgent)
 		{
 			if (plan.front()->RequireRange())
 			{
@@ -260,9 +537,15 @@ class TransitionPerformAction : public Elite::FSMTransition
 					std::cout << " go to PerformAction \n";
 					return true;
 				}
+				return false;
 			}
-			else
+			else if((!plan.front()->RequireRange()))
 			{
+				if (!plan.front()->GetRange() > 0.f)
+				{
+					std::cout << " go to PerformAction \n";
+						return true;
+				}
 				return false;
 			}
 			
@@ -302,5 +585,37 @@ class Transition : public Elite::FSMTransition
 		{
 			return false;
 		}
+	}
+};
+class TransitionMoveTo : public Elite::FSMTransition
+{
+	virtual bool ToTransition(Elite::Blackboard* pBlackboard) const override
+	{
+		std::vector<GOAP::Action*> Plan;
+		GoapAgent* pAgent;
+
+		bool GetAgent = pBlackboard->GetData("Agent", pAgent);
+		bool GetPlan = pBlackboard->GetData("Plan", Plan);
+
+		if (GetPlan && GetAgent)
+		{
+			if (Plan.front()->RequireRange())
+			{
+				if (Plan.front()->GetRange() < Elite::Distance(pAgent->GetPosition(), Plan.front()->GetTarget()))
+				{
+					std::cout << " from performAction to MoveTo \n";
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		return false;
 	}
 };
