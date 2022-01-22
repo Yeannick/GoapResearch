@@ -4,6 +4,9 @@
 #include "projects/Shared/GoapAgents/GoapAgent.h"
 #include "framework/EliteAI/EliteDecisionMaking/EliteGoalOrientedActionPlanning/GOAPAction.h"
 #include "framework/EliteAI/EliteDecisionMaking/EliteGoalOrientedActionPlanning/GOAPPlanner.h"
+#include "projects/Shared/GoapAgents/Weapon.h"
+#include "projects/Shared/GoapAgents/Knife.h"
+#include "projects/Shared/GoapAgents/Gun.h"
 
 
 
@@ -595,9 +598,10 @@ class TransitionMoveTo : public Elite::FSMTransition
 		GoapAgent* pAgent;
 
 		bool GetAgent = pBlackboard->GetData("Agent", pAgent);
-		bool GetPlan = pBlackboard->GetData("Plan", Plan);
+		
+		Plan = pAgent->GetActionPath();
 
-		if (GetPlan && GetAgent)
+		if (GetAgent && !Plan.empty())
 		{
 			if (Plan.front()->RequireRange())
 			{

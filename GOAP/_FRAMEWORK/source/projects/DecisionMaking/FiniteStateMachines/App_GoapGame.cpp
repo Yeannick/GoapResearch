@@ -3,6 +3,9 @@
 #include "GOAPStatesAndTransitions.h"
 #include "framework/EliteAI/EliteDecisionMaking/EliteGoalOrientedActionPlanning/GOAPAction.h"
 #include "framework/EliteAI/EliteDecisionMaking/EliteFiniteStateMachine/EFiniteStateMachine.h"
+
+
+
 using namespace Elite;
 App_GoapGame::App_GoapGame()
 {
@@ -19,10 +22,13 @@ App_GoapGame::~App_GoapGame()
 
 void App_GoapGame::Start()
 {
+
 	auto pAgent = new GoapAgent({ 50.f,20.f }, Elite::Color{ 0.f,1.f,0.f });
 
-	auto pEnemy = new GoapAgent({ 80.f,80.f }, Elite::Color{ 1.f,1.f,0.f });
+	auto pEnemy = new GoapAgent({ 50.f,-30.f }, Elite::Color{ 1.f,1.f,0.f });
 
+	Gun* pGun = new Gun({ -40.f, 30.f },2.f);
+	m_Weapons.push_back(pGun);
 	pAgent->SetRenderBehavior(true);
 
 	m_pEnemies.push_back(pEnemy);
@@ -31,12 +37,14 @@ void App_GoapGame::Start()
 	pStabbing->SetCost(4);
 	Shooting* pShooting = new Shooting();
 	pShooting->SetCost(3);
+	pShooting->SetTarget(pEnemy->GetPosition());
 	SelfDestruct* pSelfDestruct = new SelfDestruct();
 	pSelfDestruct->SetCost(6);
 	PickUpKnife* pPickUpKnife = new PickUpKnife();
 	pPickUpKnife->SetCost(2);
 	PickUpGun* pPickUpGun = new PickUpGun();
 	pPickUpGun->SetCost(2);
+	pPickUpGun->SetTarget(pGun->GetPosition());
 	PickUpBomb* pPickUpBomb = new PickUpBomb();
 	pPickUpBomb->SetCost(2);
 	DrawKnife* pDrawKnife = new DrawKnife();
@@ -119,6 +127,7 @@ void App_GoapGame::Start()
     pBlackBoard->AddData("GoalState", goal_win);
     pBlackBoard->AddData("Plan", std::vector<GOAP::Action*>());
 	pBlackBoard->AddData("Target", pEnemy);
+	pBlackBoard->AddData("Weapons", &m_Weapons);
 
     FiniteStateMachine* pFSM = new FiniteStateMachine(m_pStates[0], pBlackBoard);
 	pFSM->AddTransition(pIdleState, pMoveToState, MoveToTransition);
@@ -142,6 +151,14 @@ void App_GoapGame::Update(float deltaTime)
 		
 		m_StateName = agent->GetStateName();
 	}
+	for (auto w : m_Weapons)
+	{
+		w->Update(deltaTime);
+		if (w->IsOverlapping(m_GoapAgents[0]))
+		{
+		//	std::cout << "overlap\n";
+		}
+	}
 	for (auto e : m_pEnemies)
 	{
 		//e->Update(deltaTime);
@@ -159,7 +176,14 @@ void App_GoapGame::Render(float deltaTime) const
 		{ -m_TrimWorldSize, -m_TrimWorldSize }
 	};
 	DEBUGRENDERER2D->DrawPolygon(&points[0], 4, { 1,0,0,1 }, 0.4f);
-
+	for (auto w : m_Weapons )
+	{
+		if (!w->IsPickedUp())
+		{
+			w->Render(deltaTime);
+		}
+		
+	}
 	for (auto agent : m_GoapAgents)
 	{
 		agent->Render(deltaTime);
@@ -212,10 +236,21 @@ void App_GoapGame::UpdateImGui()
 		ImGui::Spacing();
 
 		ImGui::Text("Agent Info");
-		ImGui::Text("State: ");
+		ImGui::Text("State : ");
       
-         ImGui::Text(m_StateName.c_str());
-        
+        ImGui::Text(m_StateName.c_str());
+
+		ImGui::Text("Action : ");
+		if (!m_GoapAgents[0]->GetActionPath().empty())
+		{
+			ImGui::Text(m_GoapAgents[0]->GetActionPath().front()->GetName().c_str());
+		}
+		ImGui::Text("Inventory :");
+		for (size_t i = 0; i < m_GoapAgents[0]->GetInventory().size(); i++)
+		{
+			ImGui::Text(m_GoapAgents[0]->GetInventory()[i]->GetName().c_str());
+		}
+		
       
 		ImGui::Text("Survive Time: %.1f", TIMER->GetTotal());
 

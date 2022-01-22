@@ -28,6 +28,13 @@ Shooting::Shooting()
 bool Shooting::Perform(Elite::Blackboard* pBlackboard)
 {
 	std::cout << " Shooting Enemy \n";
+	GoapAgent* pAgent = nullptr;
+	bool getAgent = pBlackboard->GetData("Agent", pAgent);
+
+	Elite::Vector2 target = GetTarget();
+
+	Elite::Vector2 dir = target - pAgent->GetPosition();
+	DEBUGRENDERER2D->DrawDirection(pAgent->GetPosition(), dir, dir.Magnitude(), Elite::Color{ 1,1,1,1 });
 	return true;
 }
 // ------------------------------------------------------------------//
@@ -74,6 +81,26 @@ PickUpGun::PickUpGun()
 bool PickUpGun::Perform(Elite::Blackboard* pBlackboard)
 {
 	std::cout << " Picked up Gun \n";
+	GoapAgent* pAgent = nullptr;
+	bool GetAgent = pBlackboard->GetData("Agent", pAgent);
+	std::vector<Weapon*>* weapons;
+	bool GetGun = pBlackboard->GetData("Weapons", weapons);
+	
+	if (GetGun && GetAgent)
+	{
+		for (size_t i = 0 ; i  < weapons->size() ; i++)
+		{
+			
+			if (weapons->at(i)->GetName() == "Gun")
+			{
+
+				pAgent->AddToInventory(weapons->at(i));
+				weapons->at(i)->MarkForPickedUp();
+				
+			}
+		}
+	}
+	pBlackboard->ChangeData("Weapons", weapons);
 	return true;
 }
 // ------------------------------------------------------------------//

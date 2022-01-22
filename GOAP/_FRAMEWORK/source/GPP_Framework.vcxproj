@@ -186,6 +186,8 @@
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPWorldState.cpp" />
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPNode.cpp" />
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPPlanner.cpp" />
+    <ClCompile Include="projects\Shared\GoapAgents\Gun.cpp" />
+    <ClCompile Include="projects\Shared\GoapAgents\Knife.cpp" />
     <ClCompile Include="projects\DecisionMaking\FiniteStateMachines\GOAPStatesAndTransitions.cpp" />
     <ClCompile Include="projects\Shared\GoapAgents\GoapAgent.cpp" />
     <ClCompile Include="projects\DecisionMaking\FiniteStateMachines\App_GoapGame.cpp" />
@@ -233,12 +235,15 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_Exam|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="projects\Shared\GoapAgents\Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPAction.h" />
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPWorldState.h" />
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPNode.h" />
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPPlanner.h" />
+    <ClInclude Include="projects\Shared\GoapAgents\Gun.h" />
+    <ClInclude Include="projects\Shared\GoapAgents\Knife.h" />
     <ClInclude Include="projects\DecisionMaking\FiniteStateMachines\GOAPStatesAndTransitions.h" />
     <ClInclude Include="projects\Shared\GoapAgents\GoapAgent.h" />
     <ClInclude Include="projects\DecisionMaking\FiniteStateMachines\App_GoapGame.h" />
@@ -326,6 +331,7 @@
     <ClInclude Include="projects\Movement\SteeringBehaviors\SteeringHelpers.h" />
     <ClInclude Include="projects\Shared\BaseAgent.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="projects\Shared\GoapAgents\Weapon.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />

@@ -47,6 +47,9 @@
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPNode.cpp" />
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPPlanner.cpp" />
     <ClCompile Include="projects\DecisionMaking\FiniteStateMachines\GOAPStatesAndTransitions.cpp" />
+    <ClCompile Include="projects\Shared\GoapAgents\Weapon.cpp" />
+    <ClCompile Include="projects\Shared\GoapAgents\Knife.cpp" />
+    <ClCompile Include="projects\Shared\GoapAgents\Gun.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="projects\App_Selector.h" />
@@ -140,6 +143,9 @@
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPNode.h" />
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPPlanner.h" />
     <ClInclude Include="projects\DecisionMaking\FiniteStateMachines\GOAPStatesAndTransitions.h" />
+    <ClInclude Include="projects\Shared\GoapAgents\Weapon.h" />
+    <ClInclude Include="projects\Shared\GoapAgents\Knife.h" />
+    <ClInclude Include="projects\Shared\GoapAgents\Gun.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />

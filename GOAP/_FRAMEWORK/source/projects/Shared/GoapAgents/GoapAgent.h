@@ -1,7 +1,9 @@
 #pragma once
 #include "projects/Movement/SteeringBehaviors/SteeringAgent.h"
 #include "framework/EliteAI/EliteDecisionMaking/EliteGoalOrientedActionPlanning/GOAPAction.h"
-
+#include "projects/Shared/GoapAgents/Weapon.h"
+#include "projects/Shared/GoapAgents/Knife.h"
+#include "projects/Shared/GoapAgents/Gun.h"
 	class GoapAgent : public SteeringAgent
 	{
 	public:
@@ -33,10 +35,15 @@
 		// Actual Path of action Getter and Setter
 		std::vector<GOAP::Action*> GetActionPath() { return m_ActionPath; }
 		void SetActionPath(std::vector<GOAP::Action*> path) { m_ActionPath = path; }
+
+		void AddToInventory(Weapon* weapon) { m_Inventory.push_back(weapon); }
+		std::vector<Weapon*> GetInventory() { return m_Inventory; }
 	private:
 		// All possible actions 
 		std::vector<GOAP::Action*> m_Actions;
 
+		// inventory 
+		std::vector<Weapon*> m_Inventory;
 		// DecisionMaking 
 		Elite::IDecisionMaking* m_DecisionMaking = nullptr;
 
