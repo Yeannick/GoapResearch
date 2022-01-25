@@ -182,6 +182,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="projects\Shared\GoapAgents\Bomb.cpp" />
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPAction.cpp" />
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPWorldState.cpp" />
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPNode.cpp" />
@@ -238,6 +239,7 @@
     <ClCompile Include="projects\Shared\GoapAgents\Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="projects\Shared\GoapAgents\Bomb.h" />
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPAction.h" />
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPWorldState.h" />
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteGoalOrientedActionPlanning\GOAPNode.h" />

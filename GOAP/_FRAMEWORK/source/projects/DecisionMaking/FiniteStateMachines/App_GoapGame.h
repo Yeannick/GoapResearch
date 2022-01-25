@@ -8,7 +8,9 @@
 #include "projects/Shared/GoapAgents/Weapon.h"
 #include "projects/Shared/GoapAgents/Knife.h"
 #include "projects/Shared/GoapAgents/Gun.h"
+#include "projects/Shared/GoapAgents/Bomb.h"
 
+#include "GOAPStatesAndTransitions.h"
 
 class App_GoapGame final : public IApp
 {
@@ -35,6 +37,29 @@ private:
 
 
 	std::vector<Weapon*> m_Weapons;
+	std::vector<GOAP::WorldState> m_GoalStates;
+	Elite::Blackboard* pBlackBoard = nullptr;
+	bool IsGoalKnife = true;
+	bool IsGoalShoot = false;
+	bool IsGoalBomb = false;
 	void UpdateImGui();
+	// worldstate
+
+	GOAP::WorldState m_WorldState;
+
+	// Actions 
+
+	Stabbing* m_pStabbing = nullptr;
+	Shooting* m_pShooting = nullptr;
+	SelfDestruct* m_pSelfDestruct = nullptr;
+	PickUpKnife* m_pPickUpKnife = nullptr;
+	PickUpGun* m_pPickUpGun = nullptr;
+	PickUpBomb* m_pPickUpBomb = nullptr;
+	DrawKnife* m_pDrawKnife = nullptr;
+	DrawGun* m_pDrawGun = nullptr;
+	DrawBomb* m_pDrawBomb = nullptr;
+	SheatKnife* m_pSheatKnife = nullptr;
+	SheatGun* m_pSheatGun = nullptr;
+	SheatBomb* m_pSheatBomb = nullptr;
 };
 

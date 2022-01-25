@@ -93,7 +93,11 @@ std::vector<GOAP::Action*> GOAP::Planner::Plan(const WorldState& start, const Wo
 				current = *It;
 			} 
 			while (current.ParentId != 0);
-			Plan.push_back(current.action);
+			if (current.action)
+			{
+				Plan.push_back(current.action);
+			}
+			
 			return Plan;
 		}
 		for (const auto& Potential : actions)

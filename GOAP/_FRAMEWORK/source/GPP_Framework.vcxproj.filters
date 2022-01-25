@@ -50,6 +50,7 @@
     <ClCompile Include="projects\Shared\GoapAgents\Weapon.cpp" />
     <ClCompile Include="projects\Shared\GoapAgents\Knife.cpp" />
     <ClCompile Include="projects\Shared\GoapAgents\Gun.cpp" />
+    <ClCompile Include="projects\Shared\GoapAgents\Bomb.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="projects\App_Selector.h" />
@@ -146,6 +147,7 @@
     <ClInclude Include="projects\Shared\GoapAgents\Weapon.h" />
     <ClInclude Include="projects\Shared\GoapAgents\Knife.h" />
     <ClInclude Include="projects\Shared\GoapAgents\Gun.h" />
+    <ClInclude Include="projects\Shared\GoapAgents\Bomb.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />

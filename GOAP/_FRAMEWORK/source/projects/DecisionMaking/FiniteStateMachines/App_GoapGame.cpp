@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "App_GoapGame.h"
-#include "GOAPStatesAndTransitions.h"
+
 #include "framework/EliteAI/EliteDecisionMaking/EliteGoalOrientedActionPlanning/GOAPAction.h"
 #include "framework/EliteAI/EliteDecisionMaking/EliteFiniteStateMachine/EFiniteStateMachine.h"
 
@@ -25,82 +25,122 @@ void App_GoapGame::Start()
 
 	auto pAgent = new GoapAgent({ 50.f,20.f }, Elite::Color{ 0.f,1.f,0.f });
 
-	auto pEnemy = new GoapAgent({ 50.f,-30.f }, Elite::Color{ 1.f,1.f,0.f });
+	
 
 	Gun* pGun = new Gun({ -40.f, 30.f },2.f);
+	Knife* pKnife = new Knife({ 40.f,50.f }, 2.f);
+	Bomb* pBomb = new Bomb({ 0,70.f }, 2.f);
 	m_Weapons.push_back(pGun);
+	m_Weapons.push_back(pKnife);
+	m_Weapons.push_back(pBomb);
 	pAgent->SetRenderBehavior(true);
 
-	m_pEnemies.push_back(pEnemy);
+	m_pEnemies.push_back(new GoapAgent({ 50.f,-30.f }, Elite::Color{ 1.f,1.f,0.f }));
 	
-	Stabbing* pStabbing = new Stabbing();
-	pStabbing->SetCost(4);
-	Shooting* pShooting = new Shooting();
-	pShooting->SetCost(3);
-	pShooting->SetTarget(pEnemy->GetPosition());
-	SelfDestruct* pSelfDestruct = new SelfDestruct();
-	pSelfDestruct->SetCost(6);
-	PickUpKnife* pPickUpKnife = new PickUpKnife();
-	pPickUpKnife->SetCost(2);
-	PickUpGun* pPickUpGun = new PickUpGun();
-	pPickUpGun->SetCost(2);
-	pPickUpGun->SetTarget(pGun->GetPosition());
-	PickUpBomb* pPickUpBomb = new PickUpBomb();
-	pPickUpBomb->SetCost(2);
-	DrawKnife* pDrawKnife = new DrawKnife();
-	pDrawKnife->SetCost(1);
-	DrawGun* pDrawGun = new DrawGun();
-	pDrawGun->SetCost(2);
-	DrawBomb* pDrawBomb = new DrawBomb();
-	pDrawBomb->SetCost(3);
-	SheatKnife* pSheatKnife = new SheatKnife();
-	pSheatKnife->SetCost(1);
-	SheatGun* pSheatGun = new SheatGun();
-	pSheatGun->SetCost(2);
+	m_pStabbing = new Stabbing();
+	m_pStabbing->SetCost(4);
+	m_pStabbing->SetTarget(m_pEnemies[0]->GetPosition());
+
+	m_pShooting = new Shooting();
+	m_pShooting->SetCost(3);
+	m_pShooting->SetTarget(m_pEnemies[0]->GetPosition());
+
+	m_pSelfDestruct = new SelfDestruct();
+	m_pSelfDestruct->SetCost(6);
+	m_pSelfDestruct->SetTarget(m_pEnemies[0]->GetPosition());
+
+	m_pPickUpKnife = new PickUpKnife();
+	m_pPickUpKnife->SetCost(2);
+	m_pPickUpKnife->SetTarget(pKnife->GetPosition());
+
+	m_pPickUpGun = new PickUpGun();
+	m_pPickUpGun->SetCost(2);
+	m_pPickUpGun->SetTarget(pGun->GetPosition());
+
+	m_pPickUpBomb = new PickUpBomb();
+	m_pPickUpBomb->SetTarget(pBomb->GetPosition());
+	m_pPickUpBomb->SetCost(2);
+
+	m_pDrawKnife = new DrawKnife();
+	m_pDrawKnife->SetCost(1);
+
+	m_pDrawGun = new DrawGun();
+	m_pDrawGun->SetCost(2);
+
+	m_pDrawBomb = new DrawBomb();
+	m_pDrawBomb->SetCost(3);
+
+	m_pSheatKnife = new SheatKnife();
+	m_pSheatKnife->SetCost(1);
+
+	m_pSheatGun = new SheatGun();
+	m_pSheatGun->SetCost(2);
+
+	m_pSheatBomb = new SheatBomb();
+	m_pSheatBomb->SetCost(2);
 	
-	m_Actions.push_back(pStabbing);
-	m_Actions.push_back(pShooting);
-	m_Actions.push_back(pSelfDestruct);
-	m_Actions.push_back(pPickUpKnife);
-	m_Actions.push_back(pPickUpGun);
-	m_Actions.push_back(pPickUpBomb);
-	m_Actions.push_back(pDrawKnife);
-	m_Actions.push_back(pDrawGun);
-	m_Actions.push_back(pDrawBomb);
-	m_Actions.push_back(pSheatKnife);
-	m_Actions.push_back(pSheatGun);
+	m_Actions.push_back(m_pStabbing);
+	m_Actions.push_back(m_pShooting);
+	m_Actions.push_back(m_pSelfDestruct);
+	m_Actions.push_back(m_pPickUpKnife);
+	m_Actions.push_back(m_pPickUpGun);
+	m_Actions.push_back(m_pPickUpBomb);
+	m_Actions.push_back(m_pDrawKnife);
+	m_Actions.push_back(m_pDrawGun);
+	m_Actions.push_back(m_pDrawBomb);
+	m_Actions.push_back(m_pSheatKnife);
+	m_Actions.push_back(m_pSheatGun);
+	m_Actions.push_back(m_pSheatBomb);
 	
     // Now establish some goal states and an initial state
-    GOAP::WorldState goal_win;
-    goal_win.SetVariable("EnemyDead", true);
-    goal_win.SetVariable("MeDead", false);
+    GOAP::WorldState goalKnife;
+	goalKnife.SetVariable("EnemyDead", true);
+	goalKnife.SetVariable("KnifeInHand", true);
+	goalKnife.SetVariable("MeDead", false);
   //  goal_win.SetVariable("WeaponInHand", false);
     
-    goal_win.priority = 100;
+	goalKnife.priority = 100;
 
+	m_GoalStates.push_back(goalKnife);
+
+	GOAP::WorldState goalShoot;
+	goalShoot.SetVariable("EnemyDead", true);
+	goalShoot.SetVariable("MeDead", false);
+	goalShoot.SetVariable("GunInHand", true);
+	//  goal_win.SetVariable("WeaponInHand", false);
+
+	goalShoot.priority = 100;
+
+	m_GoalStates.push_back(goalShoot);
+
+	GOAP::WorldState goalSelfdestruct;
+	goalSelfdestruct.SetVariable("EnemyDead", true);
+	goalSelfdestruct.SetVariable("MeDead", true);
+	goalSelfdestruct.SetVariable("BombInHand", true);
+	m_GoalStates.push_back(goalSelfdestruct);
     // You can tweak these (e.g. have_ammo, the inventory items) to
     // elicit different plans from the AI.
-    GOAP::WorldState initial_state;
-    initial_state.SetVariable("EnemyDead", false);
-    initial_state.SetVariable("KnifeAvailable", true);
-    initial_state.SetVariable("KnifeInInventory", false);
-    initial_state.SetVariable("KnifeInHand", false);
-    initial_state.SetVariable("GunAvailable", true);
-    initial_state.SetVariable("GunInInventory", false);
-    initial_state.SetVariable("GunInHand", false);
-    initial_state.SetVariable("WeaponInHand", false);
-    initial_state.SetVariable("BombAvailable", true);
-    initial_state.SetVariable("BombInInventory", false);
-    initial_state.SetVariable("BombInHand", false);
-	initial_state.SetVariable("MeDead", false);
+   
+	m_WorldState.SetVariable("EnemyDead", false);
+	m_WorldState.SetVariable("KnifeAvailable", true);
+	m_WorldState.SetVariable("KnifeInInventory", false);
+	m_WorldState.SetVariable("KnifeInHand", false);
+	m_WorldState.SetVariable("GunAvailable", true);
+	m_WorldState.SetVariable("GunInInventory", false);
+	m_WorldState.SetVariable("GunInHand", false);
+	m_WorldState.SetVariable("WeaponInHand", false);
+	m_WorldState.SetVariable("BombAvailable", true);
+	m_WorldState.SetVariable("BombInInventory", false);
+	m_WorldState.SetVariable("BombInHand", false);
+	m_WorldState.SetVariable("MeDead", false);
 
-    GOAP::WorldState currentWorldState;
+   
 
     
     // Fire up the A* planner
    
     
-    Elite::Blackboard* pBlackBoard = new Elite::Blackboard();
+    pBlackBoard = new Elite::Blackboard();
     Idle* pIdleState = new Idle();
 	MoveTo *pMoveToState = new MoveTo();
 	PerformAction* pPerformActionState = new PerformAction();
@@ -118,21 +158,23 @@ void App_GoapGame::Start()
 	Transition* MoveToTransition = new Transition();
 	TransitionPerformAction* TransitionPerform = new TransitionPerformAction();
 	TransitionMoveTo* TransitionPerformMoveTo = new TransitionMoveTo();
-	
+	TransitionIdle* TransitionToIdle = new TransitionIdle();
 
     pBlackBoard->AddData("Agent", pAgent);
     pBlackBoard->AddData("Enemies", m_pEnemies);
     pBlackBoard->AddData("Actions", m_Actions );
-    pBlackBoard->AddData("WorldState", initial_state);
-    pBlackBoard->AddData("GoalState", goal_win);
+    pBlackBoard->AddData("WorldState", m_WorldState);
+    pBlackBoard->AddData("GoalState", goalKnife);
     pBlackBoard->AddData("Plan", std::vector<GOAP::Action*>());
-	pBlackBoard->AddData("Target", pEnemy);
+	pBlackBoard->AddData("Target", m_pEnemies[0]);
 	pBlackBoard->AddData("Weapons", &m_Weapons);
 
     FiniteStateMachine* pFSM = new FiniteStateMachine(m_pStates[0], pBlackBoard);
 	pFSM->AddTransition(pIdleState, pMoveToState, MoveToTransition);
 	pFSM->AddTransition(pMoveToState, pPerformActionState, TransitionPerform);
 	pFSM->AddTransition(pPerformActionState,pMoveToState,TransitionPerformMoveTo);
+	pFSM->AddTransition(pPerformActionState, pIdleState, TransitionToIdle);
+	pFSM->AddTransition(pIdleState, pPerformActionState, TransitionPerform);
     pAgent->SetDecisionMaking(pFSM);
 
 	
@@ -143,7 +185,21 @@ void App_GoapGame::Start()
 void App_GoapGame::Update(float deltaTime)
 {
 	UpdateImGui();
-
+	if (IsGoalKnife)
+	{
+		pBlackBoard->ChangeData("GoalState", m_GoalStates[0]);
+		m_WorldState.SetVariable("MeDead", false);
+	}
+	else if (IsGoalShoot)
+	{
+		pBlackBoard->ChangeData("GoalState", m_GoalStates[1]);
+		m_WorldState.SetVariable("MeDead", false);
+	}
+	else if (IsGoalBomb)
+	{
+		pBlackBoard->ChangeData("GoalState", m_GoalStates[2]);
+		m_WorldState.SetVariable("MeDead", false);
+	}
 	for (auto agent : m_GoapAgents)
 	{
 		agent->Update(deltaTime);
@@ -163,6 +219,13 @@ void App_GoapGame::Update(float deltaTime)
 	{
 		//e->Update(deltaTime);
 		e->LimitToWorld(m_TrimWorldSize);
+		
+	}
+	if (m_pEnemies[0]->GetIsKilled())
+	{
+		delete m_pEnemies[0];
+		m_pEnemies.erase(m_pEnemies.begin());
+		
 	}
 }
 
@@ -188,6 +251,12 @@ void App_GoapGame::Render(float deltaTime) const
 	{
 		agent->Render(deltaTime);
 		
+	}
+	for (auto e : m_pEnemies)
+	{
+		//e->Update(deltaTime);
+		e->Render(deltaTime);
+
 	}
 }
 
@@ -218,7 +287,67 @@ void App_GoapGame::UpdateImGui()
 		ImGui::Text("CONTROLS");
 		ImGui::Indent();
 		ImGui::Unindent();
+		static int e = 0;
+		ImGui::RadioButton("Knife",&e, 0);
+		ImGui::RadioButton("Gun", &e, 1);
+		ImGui::RadioButton("Bomb", &e, 2);
 
+		if (e == 0)
+		{
+			IsGoalKnife = true;
+			IsGoalShoot = false;
+			IsGoalBomb = false;
+			if (m_pEnemies.empty())
+			{
+				m_pEnemies.push_back( new GoapAgent({ Elite::randomFloat(50),Elite::randomFloat(50) }, Elite::Color{ 1.f,1.f,0.f }));
+				pBlackBoard->GetData("WorldState", m_WorldState);
+				m_WorldState.SetVariable("EnemyDead", false);
+				m_WorldState.SetVariable("MeDead", false);
+				m_pStabbing->SetTarget(m_pEnemies[0]->GetPosition());
+				m_pShooting->SetTarget(m_pEnemies[0]->GetPosition());
+				m_pSelfDestruct->SetTarget(m_pEnemies[0]->GetPosition());
+				pBlackBoard->ChangeData("WorldState", m_WorldState);
+				pBlackBoard->ChangeData("Target", m_pEnemies[0]);
+			}
+		}
+		if (e == 1)
+		{
+			IsGoalKnife = false;
+			IsGoalShoot = true;
+			IsGoalBomb = false;
+			if (m_pEnemies.empty())
+			{
+				m_pEnemies.push_back(new GoapAgent({ Elite::randomFloat(50),Elite::randomFloat(50) }, Elite::Color{ 1.f,1.f,0.f }));
+				pBlackBoard->GetData("WorldState", m_WorldState);
+				m_WorldState.SetVariable("EnemyDead", false);
+				m_WorldState.SetVariable("MeDead", false);
+				m_pStabbing->SetTarget(m_pEnemies[0]->GetPosition());
+				m_pShooting->SetTarget(m_pEnemies[0]->GetPosition());
+				m_pSelfDestruct->SetTarget(m_pEnemies[0]->GetPosition());
+				pBlackBoard->ChangeData("WorldState", m_WorldState);
+				pBlackBoard->ChangeData("Target", m_pEnemies[0]);
+			}
+		}
+		if (e == 2)
+		{
+			IsGoalKnife = false;
+			IsGoalShoot = false;
+			IsGoalBomb = true;
+			if (m_pEnemies.empty())
+			{
+				m_pEnemies.push_back(new GoapAgent({ Elite::randomFloat(50),Elite::randomFloat(50) }, Elite::Color{ 1.f,1.f,0.f }));
+				pBlackBoard->GetData("WorldState", m_WorldState);
+				m_WorldState.SetVariable("EnemyDead", false);
+				m_WorldState.SetVariable("MeDead", false);
+
+				m_pStabbing->SetTarget(m_pEnemies[0]->GetPosition());
+				m_pShooting->SetTarget(m_pEnemies[0]->GetPosition());
+				m_pSelfDestruct->SetTarget(m_pEnemies[0]->GetPosition());
+				pBlackBoard->ChangeData("WorldState", m_WorldState);
+				pBlackBoard->ChangeData("Target", m_pEnemies[0]);
+				
+			}
+		}
 		ImGui::Spacing();
 		ImGui::Separator();
 		ImGui::Spacing();

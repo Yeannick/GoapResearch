@@ -25,13 +25,19 @@ public:
 		GOAP::WorldState goalState;
 		bool GetGoalState = pBlackboard->GetData("GoalState", goalState);
 
-		std::vector<GOAP::Action*> actions;
-		bool GetActions = pBlackboard->GetData("Actions", actions);
+		std::vector<GOAP::Action*> actions = pAgent->GetActions();;
+		//bool GetActions = pBlackboard->GetData("Actions", actions);
 
+		PlannedActions.clear();
 		GOAP::Planner Plan;
-		std::vector<GOAP::Action*> PlannedActions;
+		
 		try {
 			PlannedActions = Plan.Plan(currentState, goalState, actions);
+			if (PlannedActions.empty())
+			{
+				std::cout << "Found no path!\n";
+				return;
+			}
 			std::cout << "\n";
 			std::cout << "Found a path!\n";
 
@@ -47,6 +53,8 @@ public:
 		}
 		catch (const std::exception&) {
 			std::cout << "Sorry, could not find a path!\n";
+			pAgent->SetActionPath(PlannedActions);
+			return;
 		}
 		if (PlannedActions.empty())return;
 		// check if action can be performed
@@ -54,10 +62,61 @@ public:
 		auto precon = PlannedActions.front()->GetPreconditons();
 		pAgent->SetActionPath(PlannedActions);
 		pBlackboard->ChangeData("Plan", PlannedActions);
-		pBlackboard->AddData("Action", PlannedActions[0]);
+	
 
 		pAgent->SetStateName(name);
 		// else transition to move to 
+	}
+	virtual void Update(Elite::Blackboard* pBlackboard, float deltaTime) override
+	{
+		if (PlannedActions.empty())
+		{
+			GoapAgent* pAgent = nullptr;
+			bool GetAgent = pBlackboard->GetData("Agent", pAgent);
+
+			GOAP::WorldState currentState;
+			bool GetWorldState = pBlackboard->GetData("WorldState", currentState);
+
+			GOAP::WorldState goalState;
+			bool GetGoalState = pBlackboard->GetData("GoalState", goalState);
+
+			std::vector<GOAP::Action*> actions = pAgent->GetActions();;
+			//bool GetActions = pBlackboard->GetData("Actions", actions);
+
+
+			GOAP::Planner Plan;
+
+			try {
+				PlannedActions = Plan.Plan(currentState, goalState, actions);
+				if (PlannedActions.empty())
+				{
+					std::cout << "Found no path!\n";
+					return;
+				}
+				std::cout << "\n";
+				std::cout << "Found a path!\n";
+
+
+				std::vector<GOAP::Action*> reversePath = PlannedActions;
+				std::reverse(reversePath.begin(), reversePath.end());
+
+				for (auto a : reversePath)
+				{
+					std::cout << a->GetName() << "\n";
+				}
+
+			}
+			catch (const std::exception&) {
+				std::cout << "Sorry, could not find a path!\n";
+			}
+			if (PlannedActions.empty())return;
+			// check if action can be performed
+			std::reverse(PlannedActions.begin(), PlannedActions.end());
+			auto precon = PlannedActions.front()->GetPreconditons();
+			pAgent->SetActionPath(PlannedActions);
+			pBlackboard->ChangeData("Plan", PlannedActions);
+			
+		}
 	}
 	virtual std::string GetName()  override
 	{ 
@@ -65,7 +124,7 @@ public:
 	}
 	int ID = 1;
 	std::string name = "Idle";
-
+	std::vector<GOAP::Action*> PlannedActions;
 	
 
 
@@ -87,12 +146,13 @@ public:
 			if (!Path.empty())
 			{
 				target = Path.front()->GetTarget();
+				if (GetAgent)
+				{
+					// set steering
+					pAgent->SetToArrival(target);
+				}
 			}
-			if (GetAgent)
-			{
-				// set steering
-				pAgent->SetToArrival(target);
-			}
+			
 
 			pAgent->SetStateName(name);
 		}
@@ -148,7 +208,7 @@ public:
 				if (path.front()->CanOperateWorldState(ws))
 				{
 					//action perform
-					performed = path.front()->Perform(pBlackboard);
+					performed = path.front()->Perform(pBlackboard,deltaTime);
 				}
 				// if action performed , Set effects , remove action from list 
 				if (performed)
@@ -160,6 +220,11 @@ public:
 				}
 			}
 		}
+	}
+	virtual void OnExit(Elite::Blackboard* pBlackboard)override
+	{
+		performed = false;
+		
 	}
 	virtual std::string GetName()  override
 	{
@@ -182,7 +247,7 @@ class Stabbing : public GOAP::Action
 public :
 	Stabbing();
 
-	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+	virtual bool Perform(Elite::Blackboard* pBlackboard, float dt) override;
 
 	bool RequireRange()override
 	{
@@ -214,7 +279,7 @@ class Shooting : public GOAP::Action
 public:
 	Shooting();
 
-	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+	virtual bool Perform(Elite::Blackboard* pBlackboard, float dt) override;
 
 	bool RequireRange()override
 	{
@@ -246,7 +311,7 @@ class SelfDestruct : public GOAP::Action
 public:
 	SelfDestruct();
 
-	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+	virtual bool Perform(Elite::Blackboard* pBlackboard, float dt) override;
 
 	bool RequireRange()override
 	{
@@ -269,6 +334,7 @@ public:
 private:
 	float m_Range;
 	Elite::Vector2 m_Target;
+	float m_Time = 0.f;
 
 	std::string m_Name = "SelfDestruct";
 };
@@ -277,7 +343,7 @@ class PickUpKnife : public GOAP::Action
 public:
 	PickUpKnife();
 
-	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+	virtual bool Perform(Elite::Blackboard* pBlackboard, float dt) override;
 
 	bool RequireRange()override
 	{
@@ -308,7 +374,7 @@ class PickUpGun : public GOAP::Action
 public:
 	PickUpGun();
 
-	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+	virtual bool Perform(Elite::Blackboard* pBlackboard, float dt) override;
 
 	bool RequireRange()override
 	{
@@ -339,7 +405,7 @@ class PickUpBomb : public GOAP::Action
 public:
 	PickUpBomb();
 
-	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+	virtual bool Perform(Elite::Blackboard* pBlackboard, float dt) override;
 
 	bool RequireRange()override
 	{
@@ -370,7 +436,7 @@ class DrawKnife : public GOAP::Action
 public:
 	DrawKnife();
 
-	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+	virtual bool Perform(Elite::Blackboard* pBlackboard, float dt) override;
 
 	bool RequireRange()override
 	{
@@ -401,7 +467,7 @@ class DrawGun : public GOAP::Action
 public:
 	DrawGun();
 
-	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+	virtual bool Perform(Elite::Blackboard* pBlackboard, float dt) override;
 
 	bool RequireRange()override
 	{
@@ -432,7 +498,7 @@ class DrawBomb : public GOAP::Action
 public:
 	DrawBomb();
 
-	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+	virtual bool Perform(Elite::Blackboard* pBlackboard, float dt) override;
 
 	bool RequireRange()override
 	{
@@ -463,7 +529,7 @@ class SheatKnife : public GOAP::Action
 public:
 	SheatKnife();
 
-	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+	virtual bool Perform(Elite::Blackboard* pBlackboard, float dt) override;
 
 	bool RequireRange()override
 	{
@@ -494,7 +560,7 @@ class SheatGun : public GOAP::Action
 public:
 	SheatGun();
 
-	virtual bool Perform(Elite::Blackboard* pBlackboard) override;
+	virtual bool Perform(Elite::Blackboard* pBlackboard, float dt) override;
 
 	bool RequireRange()override 
 	{
@@ -520,6 +586,37 @@ private:
 
 	std::string m_Name = "SheatGun";
 };
+class SheatBomb : public GOAP::Action
+{
+public:
+	SheatBomb();
+
+	virtual bool Perform(Elite::Blackboard* pBlackboard, float dt) override;
+
+	bool RequireRange()override
+	{
+		if (m_Range > 0.f)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	void SetRange(float range) { m_Range = range; }
+	float GetRange() const { return m_Range; }
+
+	void SetTarget(Elite::Vector2 position) { m_Target = position; }
+	virtual Elite::Vector2 GetTarget() { return m_Target; }
+	std::string GetName()const override { return m_Name; }
+private:
+	float m_Range;
+	Elite::Vector2 m_Target;
+
+	std::string m_Name = "SheatBomb";
+};
+
 /////////////////
 
 
@@ -533,24 +630,29 @@ class TransitionPerformAction : public Elite::FSMTransition
 		plan = pAgent->GetActionPath();
 		if ( GetAgent)
 		{
-			if (plan.front()->RequireRange())
+			if (!plan.empty())
 			{
-				if (plan.front()->GetRange() > Elite::Distance(pAgent->GetPosition(), plan.front()->GetTarget()))
+				if (plan.front()->RequireRange())
 				{
-					std::cout << " go to PerformAction \n";
-					return true;
-				}
-				return false;
-			}
-			else if((!plan.front()->RequireRange()))
-			{
-				if (!plan.front()->GetRange() > 0.f)
-				{
-					std::cout << " go to PerformAction \n";
+					if (plan.front()->GetRange() > Elite::Distance(pAgent->GetPosition(), plan.front()->GetTarget()))
+					{
+						std::cout << " go to PerformAction \n";
 						return true;
+					}
+					return false;
 				}
-				return false;
+				else if ((!plan.front()->RequireRange()))
+				{
+					if (!plan.front()->GetRange() > 0.f)
+					{
+						std::cout << " go to PerformAction \n";
+						return true;
+					}
+					return false;
+				}
 			}
+			return false;
+			
 			
 		}
 		return false;
@@ -563,30 +665,29 @@ class Transition : public Elite::FSMTransition
 	virtual bool ToTransition(Elite::Blackboard* pBlackboard) const override
 	{
 		std::vector<GOAP::Action*> plan;
-
-		bool getPlan = pBlackboard->GetData("Plan", plan);
+		GoapAgent* pAgent = nullptr;
+		bool GetAgent = pBlackboard->GetData("Agent", pAgent);
+		plan = pAgent->GetActionPath();
 
 		//ApproachClose CurrentAction;
 
 		//bool GetAction = pBlackboard->GetData("Action", CurrentAction);
 
-		if (getPlan )
+		if (GetAgent)
 		{
-
-			if (plan.front()->RequireRange())
+			if (!plan.empty())
 			{
-				std::cout << "Going to move to\n";
-				return true;
+				if (plan.front()->RequireRange())
+				{
+					std::cout << "Going to move to\n";
+					return true;
 
+				}
+				else
+				{
+					return false;
+				}
 			}
-			else
-			{
-				return false;
-			}
-		}
-		else
-		{
-			return false;
 		}
 	}
 };
@@ -619,6 +720,39 @@ class TransitionMoveTo : public Elite::FSMTransition
 			{
 				return false;
 			}
+		}
+		return false;
+	}
+};
+class TransitionIdle : public Elite::FSMTransition
+{
+	virtual bool ToTransition(Elite::Blackboard* pBlackboard) const override
+	{
+		GoapAgent* pAgent = nullptr;
+
+		bool GetAgent = pBlackboard->GetData("Agent", pAgent);
+
+		GOAP::WorldState ws;
+		bool GetWorldState = pBlackboard->GetData("WorldState", ws);
+
+		if (GetAgent && GetWorldState)
+		{
+			auto path = pAgent->GetActionPath();
+			if (!path.empty())
+			{
+				if (!path.front()->CanOperateWorldState(ws))
+				{
+					std::cout << " Next action cannot perform , back to Idle State";
+					return true;
+				}
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+			
+			
 		}
 		return false;
 	}

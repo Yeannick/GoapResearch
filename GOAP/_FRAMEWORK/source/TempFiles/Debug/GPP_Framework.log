@@ -1,4 +1,5 @@
-﻿  GOAPStatesAndTransitions.cpp
-C:\Users\yanni\Documents\Unreal Projects\GoapResearch\GOAP\_FRAMEWORK\source\projects\DecisionMaking\FiniteStateMachines\GOAPStatesAndTransitions.h(547,9): warning C4804: '>': unsafe use of type 'bool' in operation
+﻿  App_GoapGame.cpp
+C:\Users\yanni\Documents\Unreal Projects\GoapResearch\GOAP\_FRAMEWORK\source\projects\DecisionMaking\FiniteStateMachines\GOAPStatesAndTransitions.h(646,10): warning C4804: '>': unsafe use of type 'bool' in operation
+C:\Users\yanni\Documents\Unreal Projects\GoapResearch\GOAP\_FRAMEWORK\source\projects\DecisionMaking\FiniteStateMachines\GOAPStatesAndTransitions.h(692): warning C4715: 'Transition::ToTransition': not all control paths return a value
   GPP_Framework.vcxproj -> C:\Users\yanni\Documents\Unreal Projects\GoapResearch\GOAP\_FRAMEWORK\bin\Debug\GPP_Framework.exe
   0 File(s) copied

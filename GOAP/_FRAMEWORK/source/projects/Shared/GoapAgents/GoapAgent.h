@@ -27,7 +27,7 @@
 
 		// Setter for all of the possible Actions
 		void SetActions(std::vector<GOAP::Action*> actions);
-	
+		std::vector<GOAP::Action*> GetActions() { return m_Actions; }
 		// Debug Getter and setter used to display state in IMGUI UI
 		std::string GetStateName() { return m_StateName; }
 		void SetStateName(std::string name) { m_StateName = name; }
@@ -38,6 +38,9 @@
 
 		void AddToInventory(Weapon* weapon) { m_Inventory.push_back(weapon); }
 		std::vector<Weapon*> GetInventory() { return m_Inventory; }
+
+		void SetKilled() { m_IsKilled = true; }
+		bool GetIsKilled() { return m_IsKilled; }
 	private:
 		// All possible actions 
 		std::vector<GOAP::Action*> m_Actions;
@@ -59,5 +62,7 @@
 
 		// debug variables
 		std::string m_StateName;
+		// gameplay use only
+		bool m_IsKilled = false;
 	};
 

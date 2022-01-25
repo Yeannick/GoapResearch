@@ -33,7 +33,7 @@ namespace GOAP
 		void RemoveEffect(std::string key);
 
 		void SetCost(int cost) { m_Cost = cost; }
-		virtual bool Perform(Elite::Blackboard* pBlackboard) { return false; };
+		virtual bool Perform(Elite::Blackboard* pBlackboard,float dt) { return false; };
 
 		virtual bool RequireRange();
 		std::unordered_map<std::string, bool>GetPreconditons();
