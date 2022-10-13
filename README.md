@@ -6,6 +6,7 @@ FrameWork : GamePlayProgramming course Elite FrameWork using SDL
 
 goal : Making a 2D enviroment with AI that uses GOAP decisionMaking structure.
 
+![alt text](https://github.com/Yeannick/GoapResearch/blob/master/Goap.png?raw=true)
 ----------------------------------------------------------------------------------
 
 GOAP is a decisionmaking structure that uses pathfinding on actions to find the best course of actions to reach a goal.
